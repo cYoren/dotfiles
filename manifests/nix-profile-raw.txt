@@ -1,0 +1,89 @@
+Name:               brightnessctl
+Flake attribute:    legacyPackages.x86_64-linux.brightnessctl
+Original flake URL: flake:nixpkgs
+Locked flake URL:   github:NixOS/nixpkgs/f8573b9c935cfaa162dd62cc9e75ae2db86f85df
+Store paths:        /nix/store/zijdrp0r3invligdrp4zx49wql271xyi-brightnessctl-0.5.1
+
+Name:               grimblast
+Flake attribute:    legacyPackages.x86_64-linux.grimblast
+Original flake URL: flake:nixpkgs
+Locked flake URL:   github:NixOS/nixpkgs/f8573b9c935cfaa162dd62cc9e75ae2db86f85df
+Store paths:        /nix/store/0k3alkh4x8hjxgjy7c4iixaidx1nxlhg-grimblast-0.1-unstable-2026-02-19
+
+Name:               hyprland
+Flake attribute:    legacyPackages.x86_64-linux.hyprland
+Original flake URL: flake:nixpkgs
+Locked flake URL:   github:NixOS/nixpkgs/f8573b9c935cfaa162dd62cc9e75ae2db86f85df
+Store paths:        /nix/store/aqfdw3j3wlwb0rxp99axa2mmgy710pjk-hyprland-0.54.2-man /nix/store/bppd0p0jy640anzgs7qg416hv68byz7m-hyprland-0.54.2
+
+Name:               hyprland-guiutils
+Flake attribute:    packages.x86_64-linux.default
+Original flake URL: github:hyprwm/hyprland-guiutils
+Locked flake URL:   github:hyprwm/hyprland-guiutils/0703df899520001209646246bef63358c9881e36
+Store paths:        /nix/store/y3hi3dabsci7xy3vm977c1xglp1g6mvp-hyprland-guiutils-0.2.1+date=2026-03-28_0703df8
+
+Name:               hyprpaper
+Flake attribute:    legacyPackages.x86_64-linux.hyprpaper
+Original flake URL: flake:nixpkgs
+Locked flake URL:   github:NixOS/nixpkgs/f8573b9c935cfaa162dd62cc9e75ae2db86f85df
+Store paths:        /nix/store/zjsq2xziskdvvvsvhldz96grlsw9gl8v-hyprpaper-0.8.3
+
+Name:               mako
+Flake attribute:    legacyPackages.x86_64-linux.mako
+Original flake URL: flake:nixpkgs
+Locked flake URL:   github:NixOS/nixpkgs/f8573b9c935cfaa162dd62cc9e75ae2db86f85df
+Store paths:        /nix/store/v8cdgck1n6c9xma6cj5p4n78cs9d9jpj-mako-1.10.0
+
+Name:               mpv
+Flake attribute:    legacyPackages.x86_64-linux.mpv
+Original flake URL: flake:nixpkgs
+Locked flake URL:   github:NixOS/nixpkgs/8d8c1fa5b412c223ffa47410867813290cdedfef
+Store paths:        /nix/store/kykcmbqs3vx5q52n63cqdhcs8g3gfzg8-mpv-with-scripts-0.41.0
+
+Name:               mpvpaper
+Flake attribute:    legacyPackages.x86_64-linux.mpvpaper
+Original flake URL: flake:nixpkgs
+Locked flake URL:   github:NixOS/nixpkgs/8d8c1fa5b412c223ffa47410867813290cdedfef
+Store paths:        /nix/store/76g5iwkfmm67ycrxspgrwwswjgvmxmd9-mpvpaper-1.8
+
+Name:               nixGL
+Flake attribute:    packages.x86_64-linux.default
+Original flake URL: github:nix-community/nixGL
+Locked flake URL:   github:nix-community/nixGL/b6105297e6f0cd041670c3e8628394d4ee247ed5
+Store paths:        /nix/store/837cmsmjvdwh9dr3hd99w577w417f202-nixGL
+
+Name:               rofi
+Flake attribute:    legacyPackages.x86_64-linux.rofi
+Original flake URL: flake:nixpkgs
+Locked flake URL:   github:NixOS/nixpkgs/b63fe7f000adcfa269967eeff72c64cafecbbebe
+Store paths:        /nix/store/x2z809xiyb6ip74zxi0n5sb2vaqf52ry-rofi-2.0.0
+
+Name:               swaynotificationcenter
+Flake attribute:    legacyPackages.x86_64-linux.swaynotificationcenter
+Original flake URL: flake:nixpkgs
+Locked flake URL:   github:NixOS/nixpkgs/b63fe7f000adcfa269967eeff72c64cafecbbebe
+Store paths:        /nix/store/byk8pd6dssc5nf93i3amld45ihbnak48-SwayNotificationCenter-0.12.6
+
+Name:               swww
+Flake attribute:    legacyPackages.x86_64-linux.swww
+Original flake URL: flake:nixpkgs
+Locked flake URL:   github:NixOS/nixpkgs/b63fe7f000adcfa269967eeff72c64cafecbbebe
+Store paths:        /nix/store/nklvk7khbffrnwnfb7pz4njgimnrs9ky-swww-0.11.2
+
+Name:               waybar
+Flake attribute:    legacyPackages.x86_64-linux.waybar
+Original flake URL: flake:nixpkgs
+Locked flake URL:   github:NixOS/nixpkgs/f8573b9c935cfaa162dd62cc9e75ae2db86f85df
+Store paths:        /nix/store/0qmbn5xhlngn8y6yfykbpbdmpckng58g-waybar-0.15.0
+
+Name:               wofi
+Flake attribute:    legacyPackages.x86_64-linux.wofi
+Original flake URL: flake:nixpkgs
+Locked flake URL:   github:NixOS/nixpkgs/f8573b9c935cfaa162dd62cc9e75ae2db86f85df
+Store paths:        /nix/store/gs0m3xlnmbh8bmal97nkwp84i67p7f8b-wofi-1.5.3
+
+Name:               xdg-desktop-portal-hyprland
+Flake attribute:    legacyPackages.x86_64-linux.xdg-desktop-portal-hyprland
+Original flake URL: flake:nixpkgs
+Locked flake URL:   github:NixOS/nixpkgs/f8573b9c935cfaa162dd62cc9e75ae2db86f85df
+Store paths:        /nix/store/pvvf040phx54b6j64hy9si8qds3am9b1-xdg-desktop-portal-hyprland-1.3.11

@@ -1,0 +1,15 @@
+flake:nixpkgs#legacyPackages.x86_64-linux.brightnessctl
+flake:nixpkgs#legacyPackages.x86_64-linux.grimblast
+flake:nixpkgs#legacyPackages.x86_64-linux.hyprland
+github:hyprwm/hyprland-guiutils#packages.x86_64-linux.default
+flake:nixpkgs#legacyPackages.x86_64-linux.hyprpaper
+flake:nixpkgs#legacyPackages.x86_64-linux.mako
+flake:nixpkgs#legacyPackages.x86_64-linux.mpv
+flake:nixpkgs#legacyPackages.x86_64-linux.mpvpaper
+github:nix-community/nixGL#packages.x86_64-linux.default
+flake:nixpkgs#legacyPackages.x86_64-linux.rofi
+flake:nixpkgs#legacyPackages.x86_64-linux.swaynotificationcenter
+flake:nixpkgs#legacyPackages.x86_64-linux.swww
+flake:nixpkgs#legacyPackages.x86_64-linux.waybar
+flake:nixpkgs#legacyPackages.x86_64-linux.wofi
+flake:nixpkgs#legacyPackages.x86_64-linux.xdg-desktop-portal-hyprland

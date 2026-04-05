@@ -1,0 +1,15 @@
+brightnessctl
+grimblast
+hyprland
+hyprland-guiutils
+hyprpaper
+mako
+mpv
+mpvpaper
+nixGL
+rofi
+swaynotificationcenter
+swww
+waybar
+wofi
+xdg-desktop-portal-hyprland
