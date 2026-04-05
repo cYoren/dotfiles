@@ -1,0 +1,5 @@
+com.syntevo.SmartGit flathub
+com.visualstudio.code flathub
+dev.zed.Zed flathub
+io.github.flattool.Warehouse flathub
+com.github.tchx84.Flatseal flathub

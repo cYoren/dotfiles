@@ -1,0 +1,6 @@
+com.github.Matoking.protontricks flathub
+com.usebottles.bottles flathub
+io.github.fastrizwaan.WineZGUI flathub
+io.github.ryubing.Ryujinx flathub
+ru.linux_gaming.PortProton flathub
+sh.ppy.osu flathub

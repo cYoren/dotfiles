@@ -2,45 +2,71 @@
 set -euo pipefail
 
 REPO_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
-APT_MANUAL="${REPO_DIR}/manifests/apt-manual.txt"
-FLATPAK_APPS="${REPO_DIR}/manifests/flatpak-apps.txt"
-NIX_PROFILE="${REPO_DIR}/manifests/nix-profile.txt"
-NIX_PROFILE_INSTALL="${REPO_DIR}/manifests/nix-profile-install.txt"
+MANIFEST_DIR="${REPO_DIR}/manifests"
 NIX_BIN="${NIX_BIN:-/nix/var/nix/profiles/default/bin/nix}"
 
-echo "Using manifests from ${REPO_DIR}/manifests"
+DEFAULT_GROUPS=(desktop dev gaming science system plasma creative cosmic hypr)
+SELECTED_GROUPS=("$@")
 
-if command -v apt >/dev/null 2>&1; then
+if [[ ${#SELECTED_GROUPS[@]} -eq 0 ]]; then
+  SELECTED_GROUPS=("${DEFAULT_GROUPS[@]}")
+fi
+
+install_apt_group() {
+  local group="$1"
+  local file="${MANIFEST_DIR}/apt-${group}.txt"
+  [[ -f "${file}" ]] || return 0
+  command -v apt >/dev/null 2>&1 || return 0
+
   echo
-  echo "Installing APT manual packages"
+  echo "Installing APT group: ${group}"
   sudo apt update
-  sudo xargs -a "${APT_MANUAL}" apt install -y
-else
-  echo "Skipping APT install: apt not found"
-fi
+  sudo xargs -a "${file}" apt install -y
+}
 
-if command -v flatpak >/dev/null 2>&1; then
+install_flatpak_group() {
+  local group="$1"
+  local file="${MANIFEST_DIR}/flatpak-${group}.txt"
+  [[ -f "${file}" ]] || return 0
+  command -v flatpak >/dev/null 2>&1 || return 0
+
   echo
-  echo "Installing Flatpak apps"
+  echo "Installing Flatpak group: ${group}"
   while read -r app origin; do
-    [[ -z "${app}" ]] && continue
+    [[ -z "${app:-}" ]] && continue
     flatpak install -y "${origin}" "${app}"
-  done < "${FLATPAK_APPS}"
-else
-  echo "Skipping Flatpak install: flatpak not found"
-fi
+  done < "${file}"
+}
 
-if [[ -x "${NIX_BIN}" ]]; then
+install_nix_group() {
+  local group="$1"
+  local file="${MANIFEST_DIR}/nix-${group}.txt"
+  [[ -f "${file}" ]] || return 0
+  [[ -x "${NIX_BIN}" ]] || return 0
+
   echo
-  echo "Installing Nix profile packages"
+  echo "Installing Nix group: ${group}"
   while read -r ref; do
-    [[ -z "${ref}" ]] && continue
+    [[ -z "${ref:-}" ]] && continue
     "${NIX_BIN}" profile install "${ref}" || true
-  done < "${NIX_PROFILE_INSTALL}"
-else
-  echo "Skipping Nix profile install: nix binary not found at ${NIX_BIN}"
-fi
+  done < "${file}"
+}
+
+echo "Using manifests from ${MANIFEST_DIR}"
+echo "Selected groups: ${SELECTED_GROUPS[*]}"
+
+for group in "${SELECTED_GROUPS[@]}"; do
+  install_apt_group "${group}"
+done
+
+for group in "${SELECTED_GROUPS[@]}"; do
+  install_flatpak_group "${group}"
+done
+
+for group in "${SELECTED_GROUPS[@]}"; do
+  install_nix_group "${group}"
+done
 
 echo
-echo "App installation pass complete."
-echo "Some packages may need manual adjustment depending on distro release and available channels."
+echo "Installation pass complete."
+echo "Available groups: ${DEFAULT_GROUPS[*]}"

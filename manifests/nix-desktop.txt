@@ -1,0 +1,5 @@
+flake:nixpkgs#legacyPackages.x86_64-linux.brightnessctl
+flake:nixpkgs#legacyPackages.x86_64-linux.grimblast
+flake:nixpkgs#legacyPackages.x86_64-linux.mpv
+flake:nixpkgs#legacyPackages.x86_64-linux.mpvpaper
+github:nix-community/nixGL#packages.x86_64-linux.default

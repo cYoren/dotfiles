@@ -1,0 +1,8 @@
+dev.DBrox.CosmicPrivacyIndicator cosmic
+dev.DBrox.CosmicSystemMonitor cosmic
+dev.deedles.Trayscale flathub
+dev.edfloreshz.CosmicTweaks flathub
+io.github.cosmic_utils.cosmic-ext-applet-clipboard-manager cosmic
+io.github.cosmic_utils.sysinfo-applet cosmic
+io.github.kolunmi.Bazaar flathub
+io.github.petar030.cosmic-pomodoro cosmic

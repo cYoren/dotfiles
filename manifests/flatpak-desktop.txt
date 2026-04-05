@@ -1,0 +1,9 @@
+app.zen_browser.zen flathub
+com.bitwarden.desktop flathub
+com.brave.Browser flathub
+com.discordapp.Discord flathub
+com.spotify.Client flathub
+md.obsidian.Obsidian flathub
+org.fkoehler.KTailctl flathub
+org.qbittorrent.qBittorrent flathub
+org.telegram.desktop flathub

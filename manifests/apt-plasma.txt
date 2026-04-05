@@ -1,0 +1,8 @@
+kde-plasma-desktop
+kwayland-integration
+kwin-wayland
+latte-dock
+plasma-discover
+plasma-discover-backend-flatpak
+plasma-workspace-wayland
+sddm-theme-breeze

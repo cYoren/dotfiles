@@ -1,0 +1,15 @@
+connectome-workbench
+datalad
+dcm2niix
+heudiconv
+libgdal-dev
+libgfortran-14-dev
+libopenblas-dev
+libudunits2-dev
+mricron
+mrtrix3
+python3-matplotlib
+python3-nipy
+python3-nipype
+python3-numpy
+r-base-dev

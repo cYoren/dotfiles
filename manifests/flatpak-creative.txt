@@ -1,0 +1,5 @@
+com.bambulab.BambuStudio flathub
+com.obsproject.Studio flathub
+org.audacityteam.Audacity flathub
+org.blender.Blender flathub
+org.godotengine.Godot flathub

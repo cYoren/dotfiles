@@ -1,0 +1,4 @@
+appimagelauncher
+int-wallpaper-engine
+lutris
+steam-installer

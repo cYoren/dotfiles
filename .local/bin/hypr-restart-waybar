@@ -3,4 +3,16 @@ set -euo pipefail
 
 pkill -x waybar >/dev/null 2>&1 || true
 sleep 0.3
-exec /home/gustvmar/.nix-profile/bin/waybar -c /home/gustvmar/.config/waybar/config.jsonc -s /home/gustvmar/.config/waybar/style.css
+
+WAYBAR_BIN="$(command -v waybar || true)"
+
+if [ -z "${WAYBAR_BIN}" ] && [ -x "${HOME}/.nix-profile/bin/waybar" ]; then
+    WAYBAR_BIN="${HOME}/.nix-profile/bin/waybar"
+fi
+
+if [ -z "${WAYBAR_BIN}" ]; then
+    echo "waybar not found" >&2
+    exit 1
+fi
+
+exec "${WAYBAR_BIN}" -c "${HOME}/.config/waybar/config.jsonc" -s "${HOME}/.config/waybar/style.css"
