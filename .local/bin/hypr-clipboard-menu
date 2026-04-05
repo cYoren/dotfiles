@@ -1,0 +1,29 @@
+#!/bin/bash
+set -euo pipefail
+
+notify_user() {
+    if command -v notify-send >/dev/null 2>&1; then
+        notify-send "$1" "$2"
+    else
+        printf '%s: %s\n' "$1" "$2" >&2
+    fi
+}
+
+if ! command -v cliphist >/dev/null 2>&1; then
+    notify_user "Clipboard history unavailable" "Install cliphist to enable history selection."
+    exit 1
+fi
+
+if command -v rofi >/dev/null 2>&1; then
+    selection="$(cliphist list | rofi -dmenu -i -p 'Clipboard')"
+elif command -v wofi >/dev/null 2>&1; then
+    selection="$(cliphist list | wofi --show dmenu --prompt 'Clipboard')"
+else
+    notify_user "Clipboard history unavailable" "Install rofi or wofi to select entries."
+    exit 1
+fi
+
+[ -n "$selection" ] || exit 0
+
+cliphist decode <<<"$selection" | wl-copy
+notify_user "Clipboard" "Copied selected history entry."

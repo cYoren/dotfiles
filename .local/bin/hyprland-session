@@ -1,0 +1,67 @@
+#!/bin/bash
+set -euo pipefail
+
+find_amd_drm_device() {
+    local card vendor
+
+    for card in /sys/class/drm/card[0-9]*; do
+        [ -e "$card/device/vendor" ] || continue
+        vendor="$(cat "$card/device/vendor")"
+
+        if [ "$vendor" = "0x1002" ]; then
+            # AQ_DRM_DEVICES uses ':' as a separator, so /dev/dri/by-path/pci-0000:05:00.0-card
+            # is parsed into multiple invalid entries. Always export the canonical card node.
+            printf '/dev/dri/%s\n' "${card##*/}"
+            return 0
+        fi
+    done
+
+    printf 'Failed to find an AMD DRM device under /sys/class/drm.\n' >&2
+    return 1
+}
+
+export AQ_DRM_DEVICES="$(find_amd_drm_device)"
+export LIBVA_DRIVER_NAME=radeonsi
+export MOZ_ENABLE_WAYLAND=1
+export QT_QPA_PLATFORM=wayland
+export XDG_SESSION_TYPE=wayland
+export XDG_CURRENT_DESKTOP=Hyprland
+export XDG_DATA_DIRS="$HOME/.local/share/flatpak/exports/share:/var/lib/flatpak/exports/share:$HOME/.local/share:$HOME/.nix-profile/share:/usr/local/share:/usr/share${XDG_DATA_DIRS:+:$XDG_DATA_DIRS}"
+export XDG_RUNTIME_DIR="${XDG_RUNTIME_DIR:-/run/user/$(id -u)}"
+
+# Prevent nested or leaked display variables from a previous desktop session.
+unset WAYLAND_DISPLAY
+unset DISPLAY
+
+if [ "${1:-}" = "--print-env" ]; then
+    printf 'AQ_DRM_DEVICES=%s\n' "$AQ_DRM_DEVICES"
+    printf 'LIBVA_DRIVER_NAME=%s\n' "$LIBVA_DRIVER_NAME"
+    printf 'MOZ_ENABLE_WAYLAND=%s\n' "$MOZ_ENABLE_WAYLAND"
+    printf 'QT_QPA_PLATFORM=%s\n' "$QT_QPA_PLATFORM"
+    printf 'XDG_SESSION_TYPE=%s\n' "$XDG_SESSION_TYPE"
+    printf 'XDG_CURRENT_DESKTOP=%s\n' "$XDG_CURRENT_DESKTOP"
+    printf 'XDG_DATA_DIRS=%s\n' "$XDG_DATA_DIRS"
+    exit 0
+fi
+
+mkdir -p "$XDG_RUNTIME_DIR/hypr"
+chmod 700 "$XDG_RUNTIME_DIR/hypr"
+
+mkdir -p "$HOME/.local/state"
+LOGFILE="$HOME/.local/state/hyprland-session.log"
+{
+    printf '\n==== %s ====\n' "$(date --iso-8601=seconds)"
+    printf 'AQ_DRM_DEVICES=%s\n' "$AQ_DRM_DEVICES"
+    printf 'XDG_RUNTIME_DIR=%s\n' "$XDG_RUNTIME_DIR"
+    printf 'XDG_DATA_DIRS=%s\n' "$XDG_DATA_DIRS"
+} >>"$LOGFILE"
+exec >>"$LOGFILE" 2>&1
+
+# Source Nix profile so exec-once commands find binaries
+if [ -f "$HOME/.nix-profile/etc/profile.d/nix.sh" ]; then
+    . "$HOME/.nix-profile/etc/profile.d/nix.sh"
+elif [ -f /etc/profile.d/nix.sh ]; then
+    . /etc/profile.d/nix.sh
+fi
+
+exec "$HOME/.nix-profile/bin/nixGL" "$HOME/.nix-profile/bin/start-hyprland"

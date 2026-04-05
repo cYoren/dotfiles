@@ -1,0 +1,46 @@
+#!/bin/bash
+set -euo pipefail
+
+log_dir="${HOME}/.local/share/sddm"
+log_file="${log_dir}/plasma-wayland-debug.log"
+mkdir -p "$log_dir"
+exec >>"$log_file" 2>&1
+
+echo "===== plasmawayland-session $(date -Is) ====="
+echo "user=$(id -un) uid=$(id -u) pwd=$PWD"
+echo "HOME=$HOME"
+echo "XDG_SESSION_TYPE=${XDG_SESSION_TYPE:-}"
+echo "XDG_CURRENT_DESKTOP=${XDG_CURRENT_DESKTOP:-}"
+echo "WAYLAND_DISPLAY=${WAYLAND_DISPLAY:-}"
+echo "DISPLAY=${DISPLAY:-}"
+echo "--- /dev/dri ---"
+ls -l /dev/dri || true
+echo "--- drm vendors ---"
+for card in /sys/class/drm/card[0-9]*; do
+    [ -e "$card/device/vendor" ] || continue
+    printf '%s vendor=%s device=%s\n' \
+        "$card" \
+        "$(cat "$card/device/vendor" 2>/dev/null || true)" \
+        "$(cat "$card/device/device" 2>/dev/null || true)"
+done
+
+export KWIN_DRM_DEVICES=/dev/dri/card0
+export KWIN_FORCE_SW_CURSOR=1
+export KWIN_DRM_NO_DIRECT_SCANOUT=1
+export KWIN_DRM_USE_MODIFIERS=0
+export KWIN_COMPOSE=Q
+export LIBVA_DRIVER_NAME=radeonsi
+export QT_QPA_PLATFORM=wayland
+export QT_QUICK_BACKEND=software
+export QSG_RENDER_LOOP=basic
+export KWIN_FORCE_OWN_QPA=1
+export KDE_SKIP_KSPLASH=1
+export XDG_SESSION_TYPE=wayland
+export XDG_CURRENT_DESKTOP=KDE
+export XDG_SESSION_DESKTOP=KDE
+
+echo "--- environment ---"
+env | sort | rg '^(KWIN|QT_|QSG_|LIBVA|XDG_|WAYLAND|DISPLAY)' || true
+echo "--- launching plasma ---"
+
+exec /usr/lib/x86_64-linux-gnu/libexec/plasma-dbus-run-session-if-needed /usr/bin/startplasma-wayland

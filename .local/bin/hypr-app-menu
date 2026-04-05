@@ -1,0 +1,14 @@
+#!/bin/bash
+set -euo pipefail
+
+export XDG_DATA_DIRS="$HOME/.local/share/flatpak/exports/share:/var/lib/flatpak/exports/share:$HOME/.local/share:$HOME/.nix-profile/share:/usr/local/share:/usr/share${XDG_DATA_DIRS:+:$XDG_DATA_DIRS}"
+
+if command -v rofi >/dev/null 2>&1; then
+    exec rofi -show drun
+fi
+
+if command -v wofi >/dev/null 2>&1; then
+    exec wofi --show drun
+fi
+
+exec xdg-open /usr/share/applications

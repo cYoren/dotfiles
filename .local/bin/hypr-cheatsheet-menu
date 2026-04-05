@@ -1,0 +1,66 @@
+#!/bin/bash
+set -euo pipefail
+
+menu_data=$(
+    while IFS='|' read -r key action; do
+        printf '%-26s  %s\n' "$key" "$action"
+    done <<'EOF'
+SUPER + Return|Open terminal
+SUPER + D / Space|Open app launcher
+SUPER + B|Open browser
+SUPER + E|Open files
+SUPER + Shift + E|Open Yazi in terminal
+SUPER + Tab|Switch to running app
+SUPER + C|Open clipboard history
+SUPER + N|Toggle notifications
+SUPER + Escape / M|Open power menu
+SUPER + Q|Close active window
+SUPER + F|Toggle fullscreen
+SUPER + V|Toggle floating
+SUPER + P|Toggle pseudotile
+SUPER + J|Toggle split direction
+SUPER + L|Lock session
+SUPER + Shift + R|Reload Hyprland config
+SUPER + Shift + B|Restart Waybar
+SUPER + 1..0|Switch workspace
+SUPER + Shift + 1..0|Move window to workspace
+SUPER + Mouse Wheel|Cycle workspaces
+SUPER + Arrows|Move focus
+SUPER + Shift + Arrows|Move window
+SUPER + Alt + Arrows|Resize window
+Print|Screenshot area to clipboard
+Shift + Print|Screenshot full screen
+SUPER + Shift + S|Screenshot area to clipboard
+XF86Audio keys|Volume and mute
+XF86Brightness keys|Brightness up/down
+EOF
+)
+
+if command -v rofi >/dev/null 2>&1; then
+    printf '%s\n' "$menu_data" | rofi \
+        -dmenu \
+        -i \
+        -p 'Hyprland keys' \
+        -mesg 'Click-free reference. Press Esc to close.' \
+        -no-custom \
+        -theme-str 'window {width: 1100px;} listview {lines: 18; columns: 1;} element-text {font: "JetBrainsMono Nerd Font 12";}' \
+        >/dev/null
+    exit 0
+fi
+
+if command -v wofi >/dev/null 2>&1; then
+    printf '%s\n' "$menu_data" | wofi \
+        --show dmenu \
+        --prompt 'Hyprland keys' \
+        --width 1100 \
+        --height 760 \
+        --cache-file /dev/null \
+        >/dev/null
+    exit 0
+fi
+
+if command -v notify-send >/dev/null 2>&1; then
+    notify-send "Hyprland keys" "$(printf '%s\n' "$menu_data" | head -n 12)"
+else
+    printf '%s\n' "$menu_data"
+fi

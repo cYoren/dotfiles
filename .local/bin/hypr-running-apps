@@ -1,0 +1,49 @@
+#!/bin/bash
+set -euo pipefail
+
+if ! command -v hyprctl >/dev/null 2>&1 || ! command -v jq >/dev/null 2>&1; then
+    command -v notify-send >/dev/null 2>&1 && notify-send "Running apps unavailable" "This menu needs hyprctl and jq."
+    exit 1
+fi
+
+clients_json="$(hyprctl -j clients 2>/dev/null || true)"
+
+if [ -z "$clients_json" ] || [ "$clients_json" = "[]" ]; then
+    command -v notify-send >/dev/null 2>&1 && notify-send "Running apps" "No Hyprland windows are currently open."
+    exit 0
+fi
+
+menu_data="$(
+    printf '%s' "$clients_json" | jq -r '
+        map(select(.workspace.id != -1)) |
+        sort_by(.workspace.id, .class, .title)[] |
+        [
+            .address,
+            (.workspace.name // "unknown"),
+            (.class // "App"),
+            ((.title // "") | if . == "" then "Untitled" else . end)
+        ] |
+        @tsv
+    '
+)"
+
+[ -n "$menu_data" ] || exit 0
+
+formatted_menu="$(printf '%s\n' "$menu_data" | awk -F '\t' '{printf "[%s] %s - %s\t%s\n", $2, $3, $4, $1}')"
+
+if command -v rofi >/dev/null 2>&1; then
+    selected="$(printf '%s\n' "$formatted_menu" | rofi -dmenu -i -p 'Running apps')"
+elif command -v wofi >/dev/null 2>&1; then
+    selected="$(printf '%s\n' "$formatted_menu" | wofi --show dmenu --prompt 'Running apps')"
+else
+    exit 1
+fi
+
+[ -n "${selected:-}" ] || exit 0
+
+address="$(printf '%s' "$selected" | awk -F '\t' '{print $NF}')"
+workspace="$(printf '%s\n' "$menu_data" | awk -F '\t' -v addr="$address" '$1 == addr {print $2; exit}')"
+
+[ -n "$address" ] || exit 0
+[ -n "${workspace:-}" ] && hyprctl dispatch workspace "$workspace" >/dev/null 2>&1 || true
+hyprctl dispatch focuswindow "address:$address" >/dev/null 2>&1

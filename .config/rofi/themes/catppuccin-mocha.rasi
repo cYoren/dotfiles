@@ -1,0 +1,106 @@
+// Catppuccin Mocha — Rofi theme
+
+* {
+    base:     #1e1e2e;
+    mantle:   #181825;
+    surface0: #313244;
+    surface1: #45475a;
+    overlay0: #6c7086;
+    text:     #cdd6f4;
+    blue:     #89b4fa;
+    mauve:    #cba6f7;
+    red:      #f38ba8;
+
+    font:           "JetBrainsMono Nerd Font 12";
+    background-color: transparent;
+    text-color:       @text;
+}
+
+window {
+    width:            560px;
+    background-color: @base;
+    border:           2px solid;
+    border-color:     @surface0;
+    border-radius:    12px;
+}
+
+mainbox {
+    spacing:    0;
+    padding:    12px;
+    background-color: @base;
+}
+
+inputbar {
+    background-color: @mantle;
+    border-radius:    8px;
+    padding:          8px 12px;
+    spacing:          8px;
+    children:         [prompt, entry];
+}
+
+prompt {
+    background-color: @blue;
+    text-color:       @base;
+    border-radius:    4px;
+    padding:          2px 8px;
+    font:             "JetBrainsMono Nerd Font Bold 12";
+}
+
+entry {
+    text-color:       @text;
+    background-color: transparent;
+    placeholder:      "Search...";
+    placeholder-color: @overlay0;
+}
+
+listview {
+    margin:           10px 0 0;
+    padding:          0;
+    columns:          2;
+    lines:            6;
+    spacing:          6px;
+    background-color: transparent;
+    border:           0;
+}
+
+element {
+    padding:          8px 10px;
+    spacing:          8px;
+    border-radius:    8px;
+    background-color: transparent;
+    text-color:       @text;
+    orientation:      horizontal;
+}
+
+element normal.normal  { background-color: transparent; }
+element selected.normal {
+    background-color: @surface0;
+    text-color:       @blue;
+}
+element alternate.normal { background-color: transparent; }
+
+element-icon {
+    size:             22px;
+    vertical-align:   0.5;
+}
+
+element-text {
+    vertical-align:   0.5;
+}
+
+mode-switcher {
+    spacing:          6px;
+    margin:           10px 0 0;
+}
+
+button {
+    padding:          6px 12px;
+    border-radius:    6px;
+    background-color: @surface0;
+    text-color:       @overlay0;
+}
+
+button selected {
+    background-color: @blue;
+    text-color:       @base;
+}

@@ -1,0 +1,31 @@
+#!/bin/bash
+set -euo pipefail
+
+out_dir="${1:-$HOME/hypr-debug-$(date +%Y%m%d-%H%M%S)}"
+mkdir -p "$out_dir"
+
+{
+    echo "== date =="
+    date -Is
+    echo
+    echo "== uname =="
+    uname -a
+    echo
+    echo "== AQ_DRM_DEVICES wrappers =="
+    grep -n '^export AQ_DRM_DEVICES=' /usr/local/bin/hyprland-session "$HOME/.local/bin/hyprland-session" 2>/dev/null || true
+    echo
+    echo "== latest crash reports =="
+    ls -lt "$HOME/.cache/hyprland" 2>/dev/null | head -20 || true
+} > "$out_dir/summary.txt"
+
+journalctl --user -b --no-pager > "$out_dir/journal-user.txt" 2>&1 || true
+journalctl -b --no-pager > "$out_dir/journal-system.txt" 2>&1 || true
+
+if ls "$HOME"/.cache/hyprland/hyprlandCrashReport*.txt >/dev/null 2>&1; then
+    cp "$HOME"/.cache/hyprland/hyprlandCrashReport*.txt "$out_dir/" 2>/dev/null || true
+fi
+
+cp "$HOME/.config/hypr/hyprland.conf" "$out_dir/" 2>/dev/null || true
+cp "$HOME/home.nix" "$out_dir/" 2>/dev/null || true
+
+printf 'Collected Hyprland debug bundle in %s\n' "$out_dir"

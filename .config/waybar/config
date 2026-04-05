@@ -1,0 +1,114 @@
+{
+    "layer": "top",
+    "position": "top",
+    "height": 34,
+    "spacing": 4,
+    "modules-left": ["custom/launcher", "custom/running", "custom/cheatsheet", "hyprland/workspaces", "hyprland/window"],
+    "modules-center": ["clock"],
+    "modules-right": ["pulseaudio", "network", "cpu", "memory", "battery", "custom/clipboard", "custom/swaync", "tray", "custom/power"],
+
+    "custom/launcher": {
+        "format": " 󱄅 ",
+        "on-click": "/home/gustvmar/.local/bin/hypr-app-menu",
+        "tooltip": false
+    },
+    "custom/running": {
+        "format": " 󰍹 ",
+        "on-click": "/home/gustvmar/.local/bin/hypr-running-apps",
+        "tooltip": true,
+        "tooltip-format": "Running apps"
+    },
+    "custom/cheatsheet": {
+        "format": " 󰘳 ",
+        "on-click": "/home/gustvmar/.local/bin/hypr-cheatsheet-menu",
+        "tooltip": true,
+        "tooltip-format": "Hyprland cheatsheet"
+    },
+
+    "hyprland/workspaces": {
+        "format": "{icon}",
+        "format-icons": {
+            "1": "󰲡", "2": "󰲣", "3": "󰲥", "4": "󰲧", "5": "󰲩",
+            "urgent": "", "active": "", "default": ""
+        }
+    },
+
+    "hyprland/window": {
+        "format": "{}",
+        "max-length": 40,
+        "separate-outputs": true
+    },
+
+    "cpu": {
+        "format": "  {usage}%",
+        "interval": 2
+    },
+
+    "memory": {
+        "format": "  {used:0.1f}G",
+        "interval": 5
+    },
+
+    "pulseaudio": {
+        "format": "{icon} {volume}%",
+        "format-muted": "󰝟",
+        "format-icons": {
+            "default": ["󰕿", "󰖀", "󰕾"]
+        },
+        "on-click": "pavucontrol"
+    },
+
+    "network": {
+        "format-wifi": "󰖩 {signalStrength}%",
+        "format-ethernet": "󰈀 {ipaddr}",
+        "format-disconnected": "󰖪 Off"
+    },
+
+    "battery": {
+        "states": { "warning": 30, "critical": 15 },
+        "format": "{icon} {capacity}%",
+        "format-icons": ["󰁺", "󰁻", "󰁽", "󰁿", "󰂁"]
+    },
+
+    "tray": {
+        "spacing": 8
+    },
+
+    "clock": {
+        "format": " {:%a %d %b  %H:%M}",
+        "tooltip-format": "<big>{:%Y %B}</big>\n<tt>{calendar}</tt>"
+    },
+
+    "custom/clipboard": {
+        "format": " 󰅍 ",
+        "on-click": "/home/gustvmar/.local/bin/hypr-clipboard-menu",
+        "tooltip": false
+    },
+
+    "custom/swaync": {
+        "tooltip": false,
+        "format": "{icon}",
+        "format-icons": {
+            "notification": "󱅫",
+            "none": "󰂚",
+            "dnd-notification": "󱅫",
+            "dnd-none": "󰂛",
+            "inhibited-notification": "󱅫",
+            "inhibited-none": "󰂚",
+            "dnd-inhibited-notification": "󱅫",
+            "dnd-inhibited-none": "󰂛"
+        },
+        "return-type": "json",
+        "exec-if": "which swaync-client",
+        "exec": "swaync-client -swb",
+        "on-click": "swaync-client -t -sw",
+        "on-click-right": "swaync-client -d -sw",
+        "escape": true
+    },
+
+    "custom/power": {
+        "format": " 󰐥 ",
+        "on-click": "/home/gustvmar/.local/bin/hypr-power-menu",
+        "tooltip": false
+    }
+}

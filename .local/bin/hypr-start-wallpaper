@@ -1,0 +1,43 @@
+#!/usr/bin/env sh
+
+set -eu
+
+WALLPAPER_DIR="${HOME}/Pictures/wallpapers"
+STATIC_WALLPAPER="${WALLPAPER_DIR}/catppuccin-mocha.png"
+LOG_FILE="${XDG_RUNTIME_DIR:-/tmp}/hypr-start-wallpaper.log"
+OUTPUT_NAME="eDP-1"
+
+find_animated_wallpaper() {
+    for candidate in \
+        "${WALLPAPER_DIR}/ascii-mocha-falling-pink.mp4" \
+        "${WALLPAPER_DIR}/ascii-mocha-design.mp4" \
+        "${WALLPAPER_DIR}/ascii-mocha-spiral-slow.mp4" \
+        "${WALLPAPER_DIR}/ascii-mocha-spiral.mp4" \
+        "${WALLPAPER_DIR}/image-1.mp4" \
+        "${WALLPAPER_DIR}/image-1.webm" \
+        "${WALLPAPER_DIR}/image-1.gif" \
+        "${WALLPAPER_DIR}/animated.mp4" \
+        "${WALLPAPER_DIR}/animated.webm" \
+        "${WALLPAPER_DIR}/animated.gif"
+    do
+        if [ -f "${candidate}" ]; then
+            printf '%s\n' "${candidate}"
+            return 0
+        fi
+    done
+
+    return 1
+}
+
+pkill -x hyprpaper >/dev/null 2>&1 || true
+pkill -x mpvpaper >/dev/null 2>&1 || true
+
+if ANIMATED_WALLPAPER="$(find_animated_wallpaper)" && command -v mpvpaper >/dev/null 2>&1; then
+    exec mpvpaper -o "no-audio --loop=inf --panscan=1.0 --hwdec=auto-safe" "${OUTPUT_NAME}" "${ANIMATED_WALLPAPER}" >>"${LOG_FILE}" 2>&1
+fi
+
+if [ -f "${STATIC_WALLPAPER}" ] && command -v hyprpaper >/dev/null 2>&1; then
+    exec hyprpaper >>"${LOG_FILE}" 2>&1
+fi
+
+exit 0

@@ -1,0 +1,44 @@
+#!/bin/bash
+set -euo pipefail
+
+find_amd_expectation() {
+    local card vendor
+
+    for card in /sys/class/drm/card[0-9]*; do
+        [ -e "$card/device/vendor" ] || continue
+        vendor="$(cat "$card/device/vendor")"
+
+        if [ "$vendor" = "0x1002" ]; then
+            printf '/dev/dri/%s\n' "${card##*/}"
+            return 0
+        fi
+    done
+
+    printf 'No AMD DRM card found under /sys/class/drm.\n' >&2
+    return 1
+}
+
+expected="$(find_amd_expectation)"
+
+printf 'Expected AMD DRM device: %s\n' "$expected"
+printf 'Wrapper syntax: '
+bash -n "$HOME/.local/bin/hyprland-session"
+printf 'ok\n'
+
+actual="$("$HOME/.local/bin/hyprland-session" --print-env | awk -F= '/^AQ_DRM_DEVICES=/{print $2}')"
+printf 'Wrapper AQ_DRM_DEVICES: %s\n' "$actual"
+
+if [ "$actual" != "$expected" ]; then
+    printf 'Mismatch: wrapper selected %s but expected %s\n' "$actual" "$expected" >&2
+    exit 1
+fi
+
+case "$actual" in
+    *:*)
+        printf 'AQ_DRM_DEVICES must not contain colons inside a single device path: %s\n' "$actual" >&2
+        exit 1
+        ;;
+esac
+
+printf 'Hyprland config verification:\n'
+Hyprland --verify-config -c "$HOME/.config/hypr/hyprland.conf"

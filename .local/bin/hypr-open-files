@@ -1,0 +1,14 @@
+#!/bin/bash
+set -euo pipefail
+
+for app in dolphin nautilus; do
+    if command -v "$app" >/dev/null 2>&1; then
+        exec "$app" "$HOME"
+    fi
+done
+
+if command -v kitty >/dev/null 2>&1 && command -v yazi >/dev/null 2>&1; then
+    exec kitty -e yazi "$HOME"
+fi
+
+exec xdg-open "$HOME"

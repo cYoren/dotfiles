@@ -1,0 +1,14 @@
+#!/bin/bash
+set -euo pipefail
+
+if command -v flatpak >/dev/null 2>&1 && flatpak info com.brave.Browser >/dev/null 2>&1; then
+    exec flatpak run com.brave.Browser --new-window about:blank
+fi
+
+for browser in brave-browser firefox chromium; do
+    if command -v "$browser" >/dev/null 2>&1; then
+        exec "$browser"
+    fi
+done
+
+exec xdg-open "https://start.duckduckgo.com"
