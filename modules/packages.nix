@@ -30,6 +30,7 @@ in {
     ripgrep
     rofi
     starship
+    swappy
     swaynotificationcenter
     swww
     tmux

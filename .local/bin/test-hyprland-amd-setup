@@ -28,17 +28,17 @@ printf 'ok\n'
 actual="$("$HOME/.local/bin/hyprland-session" --print-env | awk -F= '/^AQ_DRM_DEVICES=/{print $2}')"
 printf 'Wrapper AQ_DRM_DEVICES: %s\n' "$actual"
 
-if [ "$actual" != "$expected" ]; then
-    printf 'Mismatch: wrapper selected %s but expected %s\n' "$actual" "$expected" >&2
+primary="${actual%%:*}"
+
+if [ "$primary" != "$expected" ]; then
+    printf 'Mismatch: wrapper primary DRM device is %s but expected %s\n' "$primary" "$expected" >&2
     exit 1
 fi
 
-case "$actual" in
-    *:*)
-        printf 'AQ_DRM_DEVICES must not contain colons inside a single device path: %s\n' "$actual" >&2
-        exit 1
-        ;;
-esac
+if [[ "$actual" == *"/dev/dri/by-path/"* ]]; then
+    printf 'AQ_DRM_DEVICES must use canonical /dev/dri/cardN nodes, got %s\n' "$actual" >&2
+    exit 1
+fi
 
 printf 'Hyprland config verification:\n'
 Hyprland --verify-config -c "$HOME/.config/hypr/hyprland.conf"

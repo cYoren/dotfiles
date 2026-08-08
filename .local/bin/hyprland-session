@@ -1,14 +1,15 @@
 #!/bin/bash
 set -euo pipefail
 
-find_amd_drm_device() {
+find_drm_device_by_vendor() {
+    local wanted_vendor="$1"
     local card vendor
 
     for card in /sys/class/drm/card[0-9]*; do
         [ -e "$card/device/vendor" ] || continue
         vendor="$(cat "$card/device/vendor")"
 
-        if [ "$vendor" = "0x1002" ]; then
+        if [ "$vendor" = "$wanted_vendor" ]; then
             # AQ_DRM_DEVICES uses ':' as a separator, so /dev/dri/by-path/pci-0000:05:00.0-card
             # is parsed into multiple invalid entries. Always export the canonical card node.
             printf '/dev/dri/%s\n' "${card##*/}"
@@ -16,11 +17,40 @@ find_amd_drm_device() {
         fi
     done
 
-    printf 'Failed to find an AMD DRM device under /sys/class/drm.\n' >&2
     return 1
 }
 
-export AQ_DRM_DEVICES="$(find_amd_drm_device)"
+build_aq_drm_devices() {
+    local nvidia_device amd_device
+
+    nvidia_device="$(find_drm_device_by_vendor 0x10de || true)"
+    amd_device="$(find_drm_device_by_vendor 0x1002 || true)"
+
+    # On this hybrid laptop the internal panel lives on the AMD iGPU while the
+    # HDMI connector is attached to the NVIDIA dGPU. Hyprland should keep AMD
+    # as the primary renderer, but the NVIDIA card still has to be present in
+    # AQ_DRM_DEVICES so HDMI-A-1 can be enumerated.
+    if [ -n "$nvidia_device" ] && [ -n "$amd_device" ]; then
+        printf '%s:%s\n' "$amd_device" "$nvidia_device"
+        return 0
+    fi
+
+    if [ -n "$amd_device" ]; then
+        printf '%s\n' "$amd_device"
+        return 0
+    fi
+
+    if [ -n "$nvidia_device" ]; then
+        printf '%s\n' "$nvidia_device"
+        return 0
+    fi
+
+    printf 'Failed to find a supported DRM device under /sys/class/drm.\n' >&2
+    return 1
+}
+
+export AQ_DRM_DEVICES="$(build_aq_drm_devices)"
+export AQ_FORCE_LINEAR_BLIT=0
 export LIBVA_DRIVER_NAME=radeonsi
 export MOZ_ENABLE_WAYLAND=1
 export QT_QPA_PLATFORM=wayland
@@ -35,6 +65,7 @@ unset DISPLAY
 
 if [ "${1:-}" = "--print-env" ]; then
     printf 'AQ_DRM_DEVICES=%s\n' "$AQ_DRM_DEVICES"
+    printf 'AQ_FORCE_LINEAR_BLIT=%s\n' "$AQ_FORCE_LINEAR_BLIT"
     printf 'LIBVA_DRIVER_NAME=%s\n' "$LIBVA_DRIVER_NAME"
     printf 'MOZ_ENABLE_WAYLAND=%s\n' "$MOZ_ENABLE_WAYLAND"
     printf 'QT_QPA_PLATFORM=%s\n' "$QT_QPA_PLATFORM"
@@ -52,6 +83,7 @@ LOGFILE="$HOME/.local/state/hyprland-session.log"
 {
     printf '\n==== %s ====\n' "$(date --iso-8601=seconds)"
     printf 'AQ_DRM_DEVICES=%s\n' "$AQ_DRM_DEVICES"
+    printf 'AQ_FORCE_LINEAR_BLIT=%s\n' "$AQ_FORCE_LINEAR_BLIT"
     printf 'XDG_RUNTIME_DIR=%s\n' "$XDG_RUNTIME_DIR"
     printf 'XDG_DATA_DIRS=%s\n' "$XDG_DATA_DIRS"
 } >>"$LOGFILE"

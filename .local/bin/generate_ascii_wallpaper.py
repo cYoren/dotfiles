@@ -9,11 +9,11 @@ from PIL import Image, ImageDraw, ImageFont
 
 WIDTH = 1920
 HEIGHT = 1080
-FPS = 24
-DURATION = 8
+FPS = 25
+DURATION = 20
 FRAMES = FPS * DURATION
 COLS = 96
-ROWS = 36
+ROWS = 40
 CELL_W = WIDTH // COLS
 CELL_H = HEIGHT // ROWS
 FONT_PATH = "/usr/share/fonts/truetype/dejavu/DejaVuSansMono.ttf"
@@ -42,7 +42,7 @@ PINK_PALETTE = [
 
 SPIRAL_CHARS = " .,:;ox%#@"
 DESIGN_CHARS = " .:+*oO0#@"
-FALLING_CHARS = ".oO0@"
+FALLING_CHARS = ".:|/"
 
 
 def lerp(a: float, b: float, t: float) -> float:
@@ -137,55 +137,84 @@ def render_falling(frame_idx: int) -> Image.Image:
     draw = ImageDraw.Draw(img)
     cycle = frame_idx / FRAMES
     cycle_angle = cycle * math.tau
+    center_x = (COLS - 1) / 2
 
-    for col in range(COLS):
-        base_x = col * CELL_W
-        column_seed = col * 0.173
-        lane_count = 2 + (col % 3)
+    for row in range(ROWS):
+        for col in range(COLS):
+            haze = 0.5 + 0.5 * math.sin(col * 0.11 + row * 0.19 + cycle_angle * 0.18)
+            shimmer = 0.5 + 0.5 * math.cos(col * 0.07 - row * 0.13 + cycle_angle * 0.11)
+            if haze * shimmer < 0.972:
+                continue
+            color = mix_hex(BG, "#6c7086", 0.12 + 0.08 * haze)
+            draw.text((col * CELL_W, row * CELL_H - 2), ".", font=FONT, fill=color)
 
-        for lane in range(lane_count):
-            lane_seed = lane * 1.913 + column_seed
-            travel_loops = 1 + ((col + lane) % 4)
-            trail_len = 6 + ((col * 3 + lane * 5) % 10)
-            phase = (0.19 * col + 0.31 * lane) % 1.0
-            head = (((cycle * travel_loops) + phase) % 1.0) * (ROWS + trail_len + 8) - trail_len
+    for row in range(ROWS):
+        for col in range(COLS):
+            nx = (col - center_x) / COLS
+            ribbon_a = row - (ROWS * 0.36 + math.sin(nx * 10.5 + cycle_angle * 0.26) * 3.8)
+            ribbon_b = row - (ROWS * 0.62 + math.sin(nx * 8.2 - cycle_angle * 0.19 + 1.2) * 3.1)
+            ribbon_strength = 0.0
+            for ribbon in (ribbon_a, ribbon_b):
+                closeness = max(0.0, 1.0 - abs(ribbon) / 1.45)
+                ribbon_strength = max(ribbon_strength, closeness)
 
-            drift_wave = math.sin(cycle_angle + lane_seed)
-            drift_wave += 0.55 * math.sin(cycle_angle * 2.0 + lane_seed * 1.7)
-            drift_wave += 0.25 * math.cos(cycle_angle * 3.0 - lane_seed * 0.9)
-            x_offset = int(drift_wave * CELL_W * 0.9)
+            if ribbon_strength < 0.58:
+                continue
 
-            streak_density = 0.55 + 0.45 * math.sin(cycle_angle * 2.0 + lane_seed * 2.2)
+            pulse = 0.72 + 0.28 * math.sin(cycle_angle * 0.9 + col * 0.1 + row * 0.08)
+            intensity = ribbon_strength * pulse
+            band = min(len(PINK_PALETTE) - 1, int(intensity * (len(PINK_PALETTE) - 1)))
+            color = mix_hex(PINK_PALETTE[band], "#f5e0dc", 0.14 * intensity)
+            char = ":" if ribbon_strength > 0.82 else "."
+            if (row + col) % 11 == 0 and ribbon_strength > 0.72:
+                char = "*"
+            draw.text((col * CELL_W, row * CELL_H - 2), char, font=FONT, fill=color)
 
-            for row in range(ROWS):
-                distance = row - head
-                if distance < -0.75 or distance > trail_len:
-                    continue
+    for lane in range(COLS):
+        lane_seed = lane * 0.41
+        base_x = lane * CELL_W
+        side_drift = 0.24 * math.sin(cycle_angle * 0.27 + lane_seed)
+        side_drift += 0.09 * math.sin(cycle_angle * 0.73 + lane_seed * 1.7)
+        x_offset = int(side_drift * CELL_W * 0.45)
+        lane_brightness = 0.72 + 0.28 * math.sin(lane_seed * 2.0 + cycle_angle * 0.16)
 
-                tail = 1.0 - (max(distance, 0.0) / trail_len)
-                sparkle = 0.5 + 0.5 * math.sin(row * 1.2 + lane_seed * 3.3 + cycle_angle * 4.0)
-                breakup = 0.5 + 0.5 * math.sin(row * 2.1 - lane_seed * 2.7 + cycle_angle * 3.0)
-                intensity = tail * (0.78 + 0.22 * sparkle) * (0.72 + 0.28 * streak_density)
-                intensity *= 0.72 + 0.28 * breakup
-                intensity = max(0.0, min(1.0, intensity))
+        if lane % 5 not in (0, 3):
+            continue
 
-                if intensity < 0.13:
-                    continue
+        for row in range(ROWS):
+            primary = 0.5 + 0.5 * math.sin(row * 0.72 - cycle_angle * (1.25 + 0.05 * (lane % 7)) + lane_seed * 1.8)
+            secondary = 0.5 + 0.5 * math.sin(row * 1.18 - cycle_angle * (0.66 + 0.03 * (lane % 5)) + lane_seed * 0.9)
+            veil = 0.5 + 0.5 * math.cos(row * 0.33 + cycle_angle * 0.41 + lane_seed * 1.4)
+            intensity = primary * 0.58 + secondary * 0.27 + veil * 0.15
+            intensity *= lane_brightness
+            intensity = max(0.0, min(1.0, intensity))
 
-                char_idx = min(len(FALLING_CHARS) - 1, int(intensity * len(FALLING_CHARS)))
-                char = FALLING_CHARS[char_idx]
-                color_idx = min(len(PINK_PALETTE) - 1, int(intensity * len(PINK_PALETTE)))
-                color = PINK_PALETTE[color_idx]
+            if intensity < 0.72:
+                continue
 
-                if distance < 0.45:
-                    color = mix_hex("#f5e0dc", color, 0.18)
-                    char = "@"
-                elif distance < 1.6:
-                    char = "0"
-                elif breakup > 0.82 and tail > 0.2:
-                    char = "|"
+            color_idx = min(len(PINK_PALETTE) - 1, int(intensity * (len(PINK_PALETTE) - 1)))
+            color = PINK_PALETTE[color_idx]
+            if intensity > 0.94:
+                char = ":"
+                color = mix_hex("#f5e0dc", color, 0.32)
+            elif intensity > 0.86:
+                char = "|"
+            elif intensity > 0.79:
+                char = "/"
+            else:
+                char = "."
 
-                draw.text((base_x + x_offset, row * CELL_H - 2), char, font=FONT, fill=color)
+            draw.text((base_x + x_offset, row * CELL_H - 2), char, font=FONT, fill=color)
+
+    for star_idx in range(14):
+        sx = (17 * star_idx + 11) % COLS
+        sy = (7 * star_idx + 5) % ROWS
+        twinkle = 0.5 + 0.5 * math.sin(cycle_angle * (0.8 + star_idx * 0.03) + star_idx * 1.7)
+        if twinkle < 0.56:
+            continue
+        color = mix_hex("#f5c2e7", "#f5e0dc", twinkle * 0.45)
+        char = "*" if twinkle > 0.82 else "+"
+        draw.text((sx * CELL_W, sy * CELL_H - 2), char, font=FONT, fill=color)
 
     return img
 

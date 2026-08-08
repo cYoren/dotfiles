@@ -9,6 +9,7 @@ OUTPUT_NAME="eDP-1"
 
 find_animated_wallpaper() {
     for candidate in \
+        "${WALLPAPER_DIR}/ascii-mocha-spiral-seamless.mp4" \
         "${WALLPAPER_DIR}/ascii-mocha-falling-pink.mp4" \
         "${WALLPAPER_DIR}/ascii-mocha-design.mp4" \
         "${WALLPAPER_DIR}/ascii-mocha-spiral-slow.mp4" \
@@ -33,7 +34,7 @@ pkill -x hyprpaper >/dev/null 2>&1 || true
 pkill -x mpvpaper >/dev/null 2>&1 || true
 
 if ANIMATED_WALLPAPER="$(find_animated_wallpaper)" && command -v mpvpaper >/dev/null 2>&1; then
-    exec mpvpaper -o "no-audio --loop=inf --panscan=1.0 --hwdec=auto-safe" "${OUTPUT_NAME}" "${ANIMATED_WALLPAPER}" >>"${LOG_FILE}" 2>&1
+    exec mpvpaper -o "no-audio --loop=inf --panscan=1.0 --hwdec=auto-safe --video-sync=display-desync --interpolation=no --framedrop=vo --vd-lavc-threads=1 --scale=nearest --dscale=nearest --cache=no" "${OUTPUT_NAME}" "${ANIMATED_WALLPAPER}" >>"${LOG_FILE}" 2>&1
 fi
 
 if [ -f "${STATIC_WALLPAPER}" ] && command -v hyprpaper >/dev/null 2>&1; then

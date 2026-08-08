@@ -7,6 +7,8 @@ let
 in {
   xdg.configFile."hypr/hyprland.conf".text = substHome ../.config/hypr/hyprland.conf;
   xdg.configFile."hypr/hyprpaper.conf".source = ../.config/hypr/hyprpaper.conf;
+  xdg.configFile."hypr/hypridle.conf".source = ../.config/hypr/hypridle.conf;
+  xdg.configFile."hypr/hyprlock.conf".text = substHome ../.config/hypr/hyprlock.conf;
 
   xdg.configFile."waybar/config".text = substHome ../.config/waybar/config;
   xdg.configFile."waybar/config.jsonc".text = substHome ../.config/waybar/config.jsonc;
@@ -73,6 +75,7 @@ in {
   home.file.".local/bin/plasmawayland-session".source = ../.local/bin/plasmawayland-session;
   home.file.".local/bin/test-hyprland-amd-setup".source = ../.local/bin/test-hyprland-amd-setup;
 
+  home.file."Pictures/wallpapers/ascii-mocha-spiral-seamless.mp4".source = ../Pictures/wallpapers/ascii-mocha-spiral-seamless.mp4;
   home.file."Pictures/wallpapers/ascii-mocha-design.mp4".source = ../Pictures/wallpapers/ascii-mocha-design.mp4;
   home.file."Pictures/wallpapers/ascii-mocha-falling-pink.mp4".source = ../Pictures/wallpapers/ascii-mocha-falling-pink.mp4;
   home.file."Pictures/wallpapers/ascii-mocha-spiral-slow.mp4".source = ../Pictures/wallpapers/ascii-mocha-spiral-slow.mp4;
