@@ -1,0 +1,19 @@
+[Unit]
+Description=Asciify Fluid live ASCII wallpaper (Wayland background layer)
+After=graphical-session.target
+PartOf=graphical-session.target
+
+[Service]
+Type=simple
+Environment=LD_PRELOAD=/usr/lib/liblayer-shell-preload.so
+Environment=LAYER_LAYER=background
+Environment=LAYER_ANCHOR=lrbt
+Environment=LAYER_NAMESPACE=local-asciify-fluid
+Environment=LAYER_KEYBOARD=none
+Environment=LAYER_EXCLUSIVE=0
+ExecStart=/usr/bin/python3 %h/.local/share/asciify-fluid/wallpaper.py
+Restart=on-failure
+RestartSec=2
+
+[Install]
+WantedBy=graphical-session.target
