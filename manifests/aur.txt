@@ -1,0 +1,2 @@
+brave-origin-beta-bin
+snapd
