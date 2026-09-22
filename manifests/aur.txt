@@ -1,2 +1,4 @@
+antigravity
+antigravity-cli
 brave-origin-beta-bin
 snapd

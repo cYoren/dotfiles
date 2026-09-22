@@ -1,0 +1,3 @@
+gtk4-layer-shell
+python-gobject
+webkit2gtk-4.1

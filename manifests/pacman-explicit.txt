@@ -19,7 +19,6 @@ bluez
 bluez-tools
 bluez-utils
 bolt
-brave-origin-beta-bin
 brightnessctl
 btop
 btrfs-progs
@@ -67,11 +66,11 @@ gnome-disk-utility
 gnome-keyring
 gnome-themes-extra
 gobuster
+godot
 gpu-screen-recorder
 grim
 grype
 gst-plugin-pipewire
-gtk4-layer-shell
 gufw
 gvfs-mtp
 gvfs-nfs
@@ -145,8 +144,8 @@ nuclei
 nvidia-open-dkms
 nvidia-prime
 nvidia-utils
-obsidian
 obs-studio
+obsidian
 ollama-cuda
 omacalc
 omacut
@@ -159,8 +158,8 @@ openai-codex-desktop
 openbsd-netcat
 osv-scanner
 pacman-contrib
-pamixer
 pam-u2f
+pamixer
 perplexity
 pinta
 pipewire
@@ -187,7 +186,6 @@ ruby
 sddm
 semgrep
 slurp
-snapd
 socat
 sof-firmware
 spotify
@@ -222,11 +220,12 @@ uwsm
 voxtype-bin
 vulkan-radeon
 vulkan-tools
-webkit2gtk-4.1
+webkitgtk-6.0
 wfuzz
 whatweb
 whois
 wifite
+wimlib
 wireless-regdb
 wireplumber
 wireshark-qt
