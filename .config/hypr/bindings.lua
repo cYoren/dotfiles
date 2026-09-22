@@ -27,3 +27,9 @@
 -- o.bind("SUPER + SHIFT + S", nil, "omarchy-capture-screenshot")
 -- o.bind("SUPER + H", nil, "voxtype record toggle")
 -- o.bind("SUPER + PERIOD", nil, "omarchy-shell shell toggle omarchy.emojis")
+
+-- Dev project picker (~/.local/bin/dev)
+o.bind("SUPER + SHIFT + D", "Run dev project", "omarchy-launch-terminal dev")
+
+-- Voice typing: tap to start, tap again to stop and transcribe
+o.bind("SUPER + H", "Voice typing toggle", "voxtype record toggle")

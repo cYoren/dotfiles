@@ -12,3 +12,12 @@ hl.monitor({ output = "", mode = "preferred", position = "auto", scale = omarchy
 
 -- Portrait/rotated secondary monitor (transform: 1 = 90°, 3 = 270°).
 -- hl.monitor({ output = "DP-2", mode = "preferred", position = "auto", scale = 1, transform = 1 })
+
+-- Keep workspaces 1-5 on the laptop panel, 6-10 on the HDMI screen, so
+-- SUPER+4/5 don't jump to the TV just because it grabbed those IDs.
+for ws = 1, 5 do
+  hl.workspace_rule({ workspace = tostring(ws), monitor = "eDP-2" })
+end
+for ws = 6, 10 do
+  hl.workspace_rule({ workspace = tostring(ws), monitor = "HDMI-A-1" })
+end

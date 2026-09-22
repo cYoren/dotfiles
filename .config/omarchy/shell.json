@@ -6,7 +6,7 @@
   },
   "bar": {
     "position": "top",
-    "transparent": false,
+    "transparent": true,
     "centerAnchor": "omarchy.clock",
     "layout": {
       "left": [
@@ -55,6 +55,9 @@
         },
         {
           "id": "omarchy.audio"
+        },
+        {
+          "id": "omarchy.media"
         },
         {
           "id": "omarchy.monitor"
