@@ -31,11 +31,17 @@ else
   echo "Previous versions of replaced files, if any, are in: $BACKUP_DIR"
 
   systemctl --user daemon-reload
-  systemctl --user enable asciify-fluid-wallpaper.service
-  if [[ -n "${WAYLAND_DISPLAY:-}" ]]; then
-    systemctl --user restart asciify-fluid-wallpaper.service
+  if [[ -x "$HOME/.local/bin/asciipaper" ]]; then
+    systemctl --user enable asciipaper.service
+    if [[ -n "${WAYLAND_DISPLAY:-}" ]]; then
+      systemctl --user restart asciipaper.service
+    else
+      echo "Wallpaper service enabled; it will start with the next graphical session."
+    fi
   else
-    echo "Wallpaper service enabled; it will start with the next graphical session."
+    echo "asciipaper is not installed; skipping the wallpaper service (see README.md)."
+    echo "https://cyoren.github.io/asciipaper/"
   fi
   echo "Kernel options are documented in README.md; /etc changes are not applied automatically."
+  echo "Compositor plugins (hypr-autoscroll, hypr-kinetic-scroll, hyprgrass) must be built from source; see .config/hypr/*.lua."
 fi

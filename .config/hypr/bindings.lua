@@ -33,3 +33,19 @@ o.bind("SUPER + SHIFT + D", "Run dev project", "omarchy-launch-terminal dev")
 
 -- Voice typing: tap to start, tap again to stop and transcribe
 o.bind("SUPER + H", "Voice typing toggle", "voxtype record toggle")
+
+-- OmaSwitch: Alt+Tab window switcher (replaces Omarchy's default window cycle)
+hl.unbind("ALT + TAB")
+hl.unbind("ALT + SHIFT + TAB")
+o.bind("ALT + TAB", "OmaSwitch", [[omarchy-shell shell summon piyush.omaswitch '{"mode":"cycle","direction":1}']])
+o.bind("ALT + SHIFT + TAB", "OmaSwitch (reverse)", [[omarchy-shell shell summon piyush.omaswitch '{"mode":"cycle","direction":-1}']])
+
+-- Stage: Mission Control-style workspace overview
+o.bind("SUPER + GRAVE", "Stage", "omarchy-shell shell toggle zzwong.stage")
+
+-- Dictation keys from before Alt + Space and Right Alt became the defaults.
+-- Remove these lines to give the keys back to applications.
+if o.dictation_installed and o.dictation_installed() then
+  o.bind("SUPER + CTRL + X", "Toggle dictation", "omarchy-dictation toggle")
+  o.bind_hold("F9", "Start dictation (push-to-talk)", "omarchy-dictation start", "Stop dictation (push-to-talk)", "omarchy-dictation stop")
+end

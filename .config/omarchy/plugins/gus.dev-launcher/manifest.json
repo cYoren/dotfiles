@@ -1,0 +1,16 @@
+{
+  "schemaVersion": 1,
+  "id": "gus.dev-launcher",
+  "name": "Dev launcher",
+  "version": "1.0.0",
+  "author": "Gus",
+  "description": "Opens the dev project picker (Super+Shift+D)",
+  "kinds": ["bar-widget"],
+  "entryPoints": { "barWidget": "DevLauncher.qml" },
+  "barWidget": {
+    "displayName": "Dev launcher",
+    "description": "Run a coding project locally",
+    "category": "System",
+    "allowMultiple": false
+  }
+}

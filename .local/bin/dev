@@ -1,0 +1,92 @@
+#!/bin/bash
+# dev — pick a project and run it locally.
+# Scans ~/Documents/Coding, ~/Projects and ~/agent-stack (repos at depth <= 3),
+# plus loose repos in $HOME, plus the medhub shortcuts.
+# Linked git worktrees and vendored reference clones are skipped.
+set -e
+ROOTS=("$HOME/Documents/Coding" "$HOME/Projects" "$HOME/agent-stack")
+SINGLES=("$HOME/radion")
+SKIP='^(Documents/Coding/(medhub/medhub-apps|medhub|games|medhub-websites)|Projects|Projects/puzzlestack-reference/.*|agent-stack|Work|wt|tmp.*)$'
+flavors="deMed ukMed caMed auMed itMed frMed"
+
+repos=$(
+  { for r in "${ROOTS[@]}"; do
+      find "$r" -maxdepth 3 -name .git \( -type d -o -type f \) 2>/dev/null
+    done
+    for d in "${SINGLES[@]}"; do
+      [ -d "$d/.git" ] && echo "$d/.git"
+    done
+  } | while read -r g; do
+    [ -f "$g" ] && continue                     # .git file = linked worktree
+    d=$(dirname "$g")
+    echo "${d#"$HOME"/}"
+  done | grep -Ev "$SKIP" | sort -u
+)
+
+# Dirs that run something but are not git repos (e.g. docker-compose labs).
+loose=$(
+  for r in "${ROOTS[@]}"; do
+    find "$r" -maxdepth 2 -type f \( -name package.json -o -name pubspec.yaml -o -name docker-compose.yml -o -name project.godot \) 2>/dev/null
+  done | while read -r f; do
+    d=$(dirname "$f")
+    [ -e "$d/.git" ] && continue
+    echo "${d#"$HOME"/}"
+  done | grep -Ev "$SKIP" | sort -u
+)
+repos=$(printf '%s\n%s\n' "$repos" "$loose" | grep -v '^$' | sort -u)
+
+list=$(
+  {
+    echo "⟳ sync all with main (safe)"
+    for f in $flavors; do echo "medhub-apps · $f"; done
+    echo "medhub-brasil (site)"
+    echo "medhub-international (site)"
+    echo "$repos"
+  }
+)
+pick=$(printf '%s\n' "$list" | fzf --prompt='run › ' --height=60% --reverse) || exit 0
+echo "▶ $pick"
+
+case "$pick" in
+  "⟳ sync"*) exec dev-sync --pause ;;
+  "medhub-apps · "*)
+    f=${pick#medhub-apps · }
+    cd "$HOME/Documents/Coding/medhub/medhub-apps"
+    exec npm run "web:${f,,}" ;;
+  "medhub-brasil (site)")
+    cd "$HOME/Documents/Coding/medhub/medhub-websites/medhub-brasil"
+    exec npm run dev ;;
+  "medhub-international (site)")
+    cd "$HOME/Documents/Coding/medhub/medhub-websites/medhub-international"
+    exec npm run dev ;;
+esac
+
+cd "$HOME/$pick"
+branch=$(git branch --show-current 2>/dev/null || true)
+[ -n "$branch" ] && echo "  on $branch"
+
+# games: the Flutter version is the main one; prefer it over Godot/Python
+sub=$(find . -maxdepth 2 -name pubspec.yaml -not -path "*/.*" 2>/dev/null | head -1)
+[ -n "$sub" ] && cd "$(dirname "$sub")"
+
+if [ -f package.json ] && grep -q '"expo"' package.json; then
+  exec npx expo start --web
+elif [ -f pubspec.yaml ]; then
+  command -v flutter >/dev/null || { echo "flutter not installed"; exec bash; }
+  command -v cmake >/dev/null && command -v ninja >/dev/null || { echo "need cmake + ninja: omarchy pkg add cmake ninja"; exec bash; }
+  exec flutter run -d linux
+elif [ -f project.godot ]; then
+  exec godot --path .
+elif [ -f docker-compose.yml ] || [ -f compose.yml ]; then
+  exec docker compose up
+elif [ -f package.json ] && grep -q '"dev"' package.json; then
+  exec npm run dev
+elif [ -f package.json ]; then
+  exec npm start
+elif [ -f pyproject.toml ]; then
+  exec uv run python -m "${pick##*/}"
+elif [ -f brainworkshop.py ]; then
+  exec uv run --with-requirements requirements.txt python brainworkshop.py
+else
+  echo "no runner known for $pick — dropping you in a shell"; exec bash
+fi

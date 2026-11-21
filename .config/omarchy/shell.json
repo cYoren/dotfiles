@@ -1,45 +1,82 @@
 {
-  "version": 1,
-  "idle": {
-    "screensaver": 150,
-    "lock": 300
-  },
   "bar": {
-    "position": "top",
-    "transparent": true,
-    "centerAnchor": "omarchy.clock",
+    "background": "glassy",
     "layout": {
+      "center": [
+        {
+          "id": "omarchy.indicators"
+        }
+      ],
+      "centerBegin": [
+        {
+          "id": "omarchy.weather"
+        },
+        {
+          "cities": [
+            {
+              "name": "San Francisco",
+              "zone": "America/Los_Angeles"
+            },
+            {
+              "name": "Berlin",
+              "zone": "Europe/Berlin"
+            },
+            {
+              "name": "Beijing",
+              "zone": "Asia/Shanghai"
+            },
+            {
+              "name": "Tokyo",
+              "zone": "Asia/Tokyo"
+            }
+          ],
+          "hour24": true,
+          "id": "omarchy.elsewhen",
+          "offsetMode": "utc"
+        },
+        {
+          "format": "ddd d MMM HH:mm",
+          "formatAlt": "d MMMM 'W'ww yyyy",
+          "id": "omarchy.clock",
+          "verticalFormat": "HH\n—\nmm"
+        }
+      ],
+      "centerEnd": [
+        {
+          "id": "omarchy.system-update"
+        }
+      ],
       "left": [
         {
           "id": "omarchy.menu"
         },
         {
           "id": "omarchy.workspaces"
-        }
-      ],
-      "center": [
-        {
-          "id": "omarchy.indicators"
         },
         {
-          "id": "omarchy.keyboard-layout"
-        },
-        {
-          "id": "omarchy.clock",
-          "format": "dddd HH:mm",
-          "formatAlt": "d MMMM 'W'ww yyyy",
-          "verticalFormat": "HH\n—\nmm"
-        },
-        {
-          "id": "omarchy.weather"
-        },
-        {
-          "id": "omarchy.system-update"
+          "exec": "~/.config/omarchy/bar/scripts/sysstats",
+          "fontSize": 11,
+          "id": "sysstats",
+          "interval": 5,
+          "onClick": "omarchy-launch-or-focus-tui btop",
+          "type": "command"
         }
       ],
       "right": [
         {
           "id": "omarchy.tray"
+        },
+        {
+          "id": "omarchy.keyboard-layout"
+        },
+        {
+          "id": "gus.dev-launcher"
+        },
+        {
+          "id": "gus.dev-sync"
+        },
+        {
+          "id": "shavanced.notification-center"
         },
         {
           "id": "omarchy.agents"
@@ -65,8 +102,34 @@
         {
           "id": "omarchy.power"
         }
-      ]
-    }
+      ],
+      "tray": []
+    },
+    "position": "top"
   },
-  "plugins": []
+  "dock": {
+    "pinned": [
+      "org.gnome.Nautilus",
+      "foot",
+      "omacalc",
+      "omawrite",
+      "X"
+    ]
+  },
+  "idle": {
+    "lock": 300,
+    "screensaver": 301
+  },
+  "plugins": [
+    {
+      "id": "piyush.omaswitch"
+    },
+    {
+      "id": "zzwong.stage"
+    },
+    {
+      "id": "bobbynicholas.omaland"
+    }
+  ],
+  "version": 1
 }

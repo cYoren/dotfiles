@@ -13,8 +13,11 @@ source "$OMARCHY_PATH/default/bash/rc"
 # Make an alias for invoking commands you use constantly
 # alias p='python'
 
-. "$HOME/.local/bin/env"
+. "$HOME/.local/share/../bin/env"
 
 
 # Added by Antigravity CLI installer
 export PATH="$HOME/.local/bin:$PATH"
+
+# opencode
+export PATH=$HOME/.opencode/bin:$PATH

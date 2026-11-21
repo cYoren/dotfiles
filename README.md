@@ -1,34 +1,88 @@
-# Gus's dotfiles
+# dotfiles
 
-Personal configuration for **Omarchy 4 / Arch Linux + Hyprland** on a Dell G15 5525. The AMD 680M drives the laptop panel and the RTX 3050 drives HDMI.
+![The desktop: ASCII Paper wallpaper, Omarchy bar, nothing else](screenshots/desktop.png)
 
-The animated ASCII wallpaper is an Asciify Fluid canvas running as a separate Wayland background-layer process.
+Omarchy 4 on Arch Linux, Hyprland 0.56.2 in Lua mode, on a Dell G15 5525. The Radeon 680M drives
+the laptop panel, the RTX 3050 owns the HDMI port. The wallpaper is not a video: it is
+[ASCII Paper](https://cyoren.github.io/asciipaper/), an animated ASCII renderer running as its own
+Wayland background layer.
 
-## What this repository restores
+## The wallpaper
 
-This is a configuration and package-selection backup, not a full disk image. It stores selected user configuration, scripts, package lists, NVIDIA module options, and notes for the kernel command line. It does not include personal files, application databases, browser profiles, credentials, or a copy of the installed operating system. Keep a separate encrypted backup of personal data and any required credentials.
+ASCII Paper writes every frame on the GPU: one shader returns a colour and a brightness per
+character cell, a glyph ramp turns that into text. It runs as a `systemd --user` unit pinned to the
+background layer, so the compositor treats it as wallpaper and windows never fight it.
 
-Files under `.config/` and `.local/`, plus the checked-in shell startup files, mirror `$HOME`. `scripts/restore.sh` overlays only the paths in this repository; it does not delete unrelated files. Before replacing an existing tracked file, it saves the old version under `~/.local/state/dotfiles-restore-backups/`.
+| Piece | Path |
+|---|---|
+| launcher | `~/.local/bin/asciipaper` 1.6.0, native renderer in `~/.local/bin/asciipaper-engine` |
+| service | `.config/systemd/user/asciipaper.service`, `ASCIIPAPER_SERVICE=1`, `PartOf=graphical-session.target`, restarts on failure |
+| tuning | `.config/asciipaper/engine.json`: 25 fps, 9 fps when idle, quality 1.5, pointer 1.8, speed 1.35, `"renderer": "native"` |
+| selected look | `.config/asciipaper/wallpaper` → `plasma-mine-9` |
+| the look itself | `.local/share/asciipaper/user-wallpapers/plasma-mine-9.json` and `.glsl` |
+
+`Drift` is what the screenshot shows: `dots` shape, cell 10, charset ` .:-=+*#%@`, an eight colour
+palette on `#050507`, swirl interaction (strength 0.4, radius 0.25) so the pointer drags the field,
+pace 0.3. The shader is 14 lines of demoscene plasma, and both files are in this repository.
+
+```sh
+asciipaper preview plasma-mine-9      # try it in a normal window
+asciipaper set plasma-mine-9          # choose it and restart the service
+systemctl --user status asciipaper
+```
+
+It is cheap by design: one full screen quad per frame, 9 fps when idle, and it pauses behind windows
+and while the machine is locked. On a 680M that matters more than it sounds.
+
+ASCII Paper is free on Linux (tarball or PKGBUILD from the site above) and paid on the app stores.
+If you came here for ricing, the reusable part is the engine:
+[cYoren/asciipaper-engine](https://github.com/cYoren/asciipaper-engine) is public, MIT, and renders
+the same JSON specs without the app.
+
+## What is in here
 
 | Path | What |
-|------|------|
-| `.config/hypr/` | Omarchy Lua configuration and Hyprland overrides; `hyprland.lua` selects the AMD iGPU for VA-API/GLX |
-| `.config/omarchy/` | Shell layout, theme, branding, and hooks |
-| `.config/{alacritty,ghostty,kitty,foot}/` | Terminal settings |
-| `.config/{nvim,tmux,btop,starship.toml,git/config}` | Editor and command-line tools |
-| `.bashrc`, `.bash_profile`, `.profile`, `.zshrc` | Shell startup and local PATH setup |
-| `.local/bin/env` and `.local/bin/env.fish` | PATH setup for Bash/Zsh and Fish |
-| `.local/share/asciify-fluid/wallpaper.py` | Wallpaper window and rendering logic |
-| `.local/bin/asciify-fluid-wallpaper.sh` | Alternative Chromium-based launcher |
-| `.config/systemd/user/asciify-fluid-wallpaper.service` | Starts the wallpaper with the graphical session |
-| `etc/modprobe.d/nvidia.conf` | NVIDIA runtime power management options; install manually as described below |
-| `manifests/` | Explicitly installed native packages, foreign packages, and wallpaper runtime dependencies |
-| `scripts/` | Restore and package-list capture helpers |
-| `archive/` | Previous Debian, Plasma, Hyprland, and Nix setup |
+|---|---|
+| `.config/hypr/` | Lua config: monitors, input and native gestures, bindings, look and feel, autostart, `autoscroll.lua`, `plugins-extra.lua`, `hyprsunset.conf` |
+| `.config/omarchy/` | bar layout (`shell.json`: glassy, sysstats, weather and an `elsewhen` world clock), `bar/scripts/sysstats`, branding, hooks, and the two bar widgets I wrote |
+| `.config/asciipaper/`, `.local/share/asciipaper/user-wallpapers/` | wallpaper tuning, choice and the Drift spec |
+| `.config/systemd/user/asciipaper.service` | starts the wallpaper with the graphical session |
+| `.config/{kitty,alacritty,ghostty,foot}/` | terminals |
+| `.config/{nvim,tmux,btop,starship.toml,git/config}` | LazyVim, tmux, btop, prompt, git identity and credential helper |
+| `.local/bin/dev`, `.local/bin/dev-sync` | project launcher (`fzf` over every repo, runs it by type) and a fast-forward-only sync of every checkout |
+| `.bashrc`, `.bash_profile`, `.profile`, `.zshrc`, `.local/bin/env*` | shell startup; paths use `$HOME`, never a hard coded user |
+| `etc/modprobe.d/nvidia.conf` | NVIDIA runtime power management (installed by hand, see below) |
+| `manifests/` | native packages, foreign packages, wallpaper runtime dependencies |
+| `scripts/` | `restore.sh`, `capture-manifests.sh` |
+| `archive/` | the previous Debian, Plasma and Nix setup |
 
-## Restore on Omarchy / Arch
+## Mine and not mine
 
-Start from a working Omarchy installation with network access, a configured user account, and an AUR helper such as `yay`. On a fresh Arch installation, configure the package repositories this machine uses (including Omarchy and BlackArch repositories where needed) before installing the package lists:
+Mine: everything in `hypr/`, the bar layout, `sysstats`, the two `gus.*` bar widgets, `dev` and
+`dev-sync`, the Drift wallpaper, the print of this README.
+
+Not mine, and not copied here: the four shell plugins I run are other people's work, installed with
+`omarchy plugin add <url> --enable`:
+
+```sh
+omarchy plugin add https://github.com/piyush97/omaswitch.git --enable                     # Alt+Tab with previews
+omarchy plugin add https://github.com/zzwong/omarchy-stage --enable                     # Mission Control overview
+omarchy plugin add https://github.com/bobby-nicholas/omaland --enable                   # visual look editor
+omarchy plugin add https://github.com/Shavanced/omarchy-notification-center-plugin.git --enable
+```
+
+The compositor plugins are built from source against Hyprland 0.56.2 and loaded by
+`.config/hypr/autoscroll.lua` and `.config/hypr/plugins-extra.lua`. Rebuild them after every
+Hyprland update, the commands are in the comments of those two files:
+
+- [estebanhiram/hypr-autoscroll](https://github.com/estebanhiram/hypr-autoscroll): middle click autoscroll, `SUPER + A` toggles it off for terminals
+- [savonovv/hypr-kinetic-scroll](https://github.com/savonovv/hypr-kinetic-scroll): inertial scrolling
+- [horriblename/hyprgrass](https://github.com/horriblename/hyprgrass): loaded, but this laptop has no touchscreen so its gestures never fire; touchpad gestures are native Hyprland ones in `input.lua`
+
+## Restore
+
+Start from a working Omarchy install with network, a user account, and `yay`. On a bare Arch install
+add the Omarchy and BlackArch repositories first, the package lists assume they exist.
 
 ```bash
 git clone https://github.com/cYoren/dotfiles.git ~/Documents/dotfiles
@@ -40,26 +94,41 @@ sudo pacman -S --needed - < manifests/runtime-dependencies.txt
 ./scripts/restore.sh
 ```
 
-The package lists record package names, not package versions or repository snapshots. A future Arch mirror may no longer provide an old package name or version. `aur.txt` is generated from Pacman's explicitly installed foreign packages; that list can include packages from AUR helpers or other sources.
+`restore.sh` overlays only the paths in this repository, never deletes unrelated files, and keeps the
+previous version of every replaced file under `~/.local/state/dotfiles-restore-backups/<stamp>/`.
+It also enables `asciipaper.service`, which starts with the next graphical session. The wallpaper
+needs `gtk4-layer-shell`, `python-gobject` and `webkit2gtk-4.1` (in `runtime-dependencies.txt`), and
+the app itself: install it from [the site](https://cyoren.github.io/asciipaper/).
 
-Install the system-level NVIDIA options if they are still appropriate for the machine:
+System level, by hand, because none of it can live in `$HOME`:
 
 ```bash
 sudo install -Dm644 etc/modprobe.d/nvidia.conf /etc/modprobe.d/nvidia.conf
 ```
 
-The kernel command line used on this laptop is `acpi_backlight=native amdgpu.dcdebugmask=0x10`. Review the bootloader's current configuration before applying it. The wallpaper service is enabled by the restore script and starts when the graphical session is available. It requires `webkit2gtk-4.1`, `python-gobject`, and `gtk4-layer-shell`.
+Kernel command line on this laptop: `acpi_backlight=native amdgpu.dcdebugmask=0x10`. `acpi_backlight`
+gives the brightness keys back to `amdgpu_bl0` (a bogus `nvidia_wmi_ec_backlight` device was hiding
+it), `dcdebugmask=0x10` disables PSR to stop recurring DMCUB errors. Check the bootloader before
+copying either.
 
-## Refresh package lists
+Known sharp edge, since it looks like an Omarchy bug: `hyprland.lua` exports
+`__GLX_VENDOR_LIBRARY_NAME=mesa` so video decodes on the iGPU instead of crossing GPUs and going
+black. Steam Linux Runtime games that bundle their own `libstdc++` crash with it (CS2 segfaults at
+the main menu). Fix per game with the launch option `env -u __GLX_VENDOR_LIBRARY_NAME %command%`.
 
-After installing or removing software intentionally, update the checked-in package lists with:
+## Refresh the package lists
+
+After installing or removing software on purpose:
 
 ```bash
 ./scripts/capture-manifests.sh
 ```
 
-Review the resulting changes before committing. Do not add tokens, private keys, browser data, or other credentials to this public repository.
+It records package names, not versions. Review the diff before committing, and never add tokens,
+private keys, browser data or other credentials to this public repository.
 
 ## Archive
 
-- `archive/debian-plasma-hyprland-nix/` — previous Debian setup with KDE Plasma, Hyprland via Nix Home Manager, package manifests, and earlier ASCII wallpapers. See its README for that restore flow.
+`archive/debian-plasma-hyprland-nix/` is the previous Debian setup: KDE Plasma, Hyprland through Nix
+Home Manager, its own manifests and the older ASCII wallpapers. Its README describes that restore
+flow. Nothing in it is active on this machine.

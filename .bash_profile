@@ -4,7 +4,7 @@
 
 [[ -f ~/.bashrc ]] && . ~/.bashrc
 
-. "$HOME/.local/bin/env"
+. "$HOME/.local/share/../bin/env"
 
 
 # Added by Antigravity CLI installer

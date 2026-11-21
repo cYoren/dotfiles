@@ -1,0 +1,23 @@
+import QtQuick
+import Quickshell
+import qs.Commons
+import qs.Ui
+
+BarWidget {
+  id: root
+  moduleName: "gus.dev-launcher"
+
+  implicitWidth: button.implicitWidth
+  implicitHeight: button.implicitHeight
+
+  BarIconButton {
+    id: button
+    anchors.fill: parent
+    bar: root.bar
+    text: ""
+    slotSize: Style.bar.statusSlot
+    fontSize: Style.font.caption
+    tooltipText: "Run dev project (Super+Shift+D)"
+    onPressed: if (root.bar) root.bar.run("omarchy-launch-terminal dev")
+  }
+}

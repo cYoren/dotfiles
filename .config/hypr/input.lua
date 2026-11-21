@@ -48,10 +48,20 @@
 -- o.window("(Alacritty|kitty|foot)", { scroll_touchpad = 1.5 })
 -- o.window("com.mitchellh.ghostty", { scroll_touchpad = 0.2 })
 
--- Enable touchpad gestures for changing workspaces.
+-- Native Hyprland touchpad gestures.
 -- See https://wiki.hypr.land/Configuring/Advanced-and-Cool/Gestures/
--- hl.gesture({ fingers = 3, direction = "horizontal", action = "workspace" })
 
--- Enable touchpad gestures for moving focus (helpful on scrolling layout).
--- hl.gesture({ fingers = 3, direction = "left", action = function() hl.dispatch(hl.dsp.focus({ direction = "l" })) end })
--- hl.gesture({ fingers = 3, direction = "right", action = function() hl.dispatch(hl.dsp.focus({ direction = "r" })) end })
+-- Three-finger horizontal swipe changes workspaces.
+hl.gesture({ fingers = 3, direction = "horizontal", action = "workspace" })
+
+-- Three-finger swipe down closes the focused window.
+hl.gesture({ fingers = 3, direction = "down", action = "close" })
+
+-- Four-finger swipe up opens/closes the Stage overview.
+hl.gesture({
+  fingers = 4,
+  direction = "up",
+  action = function()
+    hl.exec_cmd("omarchy-shell shell toggle zzwong.stage")
+  end,
+})

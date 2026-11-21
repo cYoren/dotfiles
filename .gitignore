@@ -1,9 +1,16 @@
 .DS_Store
 *.log
 *.bak
+*.bak.*
 *.tmp
 *.swp
 __pycache__/
 .direnv/
 .env
 .env.*
+
+# asciipaper keeps a community session token and a moderator key next to its settings.
+# They are local credentials: never commit them, never add them to a wallpaper export.
+.config/asciipaper/community-session.json
+.config/asciipaper/moderator-key
+.local/share/asciipaper/storage/

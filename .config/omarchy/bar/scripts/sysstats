@@ -1,0 +1,74 @@
+#!/usr/bin/env bash
+# CPU / RAM / GPU readout for the omarchy bar.
+# Prints Waybar-style JSON: {"text": "...", "tooltip": "..."}
+set -u
+
+state="${XDG_RUNTIME_DIR:-/tmp}/omarchy-sysstats.cpu"
+
+# ---- CPU (delta since previous run) ----
+read -r cpu_line < /proc/stat
+# shellcheck disable=SC2086
+set -- $cpu_line
+shift
+user=${1:-0} nice=${2:-0} sys=${3:-0} idle=${4:-0}
+iow=${5:-0} irq=${6:-0} sirq=${7:-0} steal=${8:-0}
+
+total=$((user + nice + sys + idle + iow + irq + sirq + steal))
+idle_all=$((idle + iow))
+
+cpu_pct="--"
+if [ -f "$state" ]; then
+  read -r prev_total prev_idle < "$state"
+  d_total=$((total - prev_total))
+  d_idle=$((idle_all - prev_idle))
+  if [ "$d_total" -gt 0 ]; then
+    cpu_pct=$(((100 * (d_total - d_idle)) / d_total))
+  fi
+fi
+printf '%s %s\n' "$total" "$idle_all" > "$state"
+
+# ---- RAM (kB) ----
+mem_get() { awk -v k="$1" '$1 == k":" { print $2 }' /proc/meminfo; }
+
+mem_total=$(mem_get MemTotal)
+mem_avail=$(mem_get MemAvailable)
+swap_total=$(mem_get SwapTotal)
+swap_free=$(mem_get SwapFree)
+
+kb_to_g() { awk -v k="${1:-0}" 'BEGIN { printf "%.1fG", k / 1048576 }'; }
+
+mem_used_g=$(kb_to_g $((mem_total - mem_avail)))
+mem_total_g=$(kb_to_g "$mem_total")
+mem_avail_g=$(kb_to_g "$mem_avail")
+swap_used_g=$(kb_to_g $((swap_total - swap_free)))
+
+# ---- GPU ----
+gpu_pct="--"
+gpu_line=""
+nv=$(nvidia-smi --query-gpu=utilization.gpu,memory.used,memory.total,temperature.gpu \
+  --format=csv,noheader,nounits 2>/dev/null | head -1)
+if [ -n "$nv" ]; then
+  IFS=',' read -r nv_util nv_mem nv_mem_total nv_temp <<< "$nv"
+  nv_util=$(echo "$nv_util" | tr -d ' ')
+  nv_mem=$(echo "$nv_mem" | tr -d ' ')
+  nv_temp=$(echo "$nv_temp" | tr -d ' ')
+  gpu_pct="$nv_util"
+  gpu_line="NVIDIA RTX 3050: ${nv_util}% · ${nv_mem}MiB · ${nv_temp}°C"
+else
+  gpu_line="NVIDIA RTX 3050: suspensa"
+fi
+
+for f in /sys/class/drm/card*/device/gpu_busy_percent; do
+  [ -r "$f" ] || continue
+  amd=$(cat "$f" 2>/dev/null)
+  [ -n "$amd" ] && gpu_line="$gpu_line\nRadeon 680M: ${amd}%"
+done
+
+# ---- Output ----
+if [ "$cpu_pct" = "--" ]; then cpu_txt="--"; else cpu_txt="${cpu_pct}%"; fi
+if [ "$gpu_pct" = "--" ]; then gpu_txt="--"; else gpu_txt="${gpu_pct}%"; fi
+
+text="CPU ${cpu_txt} · RAM ${mem_used_g} · GPU ${gpu_txt}"
+tooltip="RAM ${mem_used_g} / ${mem_total_g} usada (${mem_avail_g} disponível)\nSwap ${swap_used_g} usada\n${gpu_line}\nClique para abrir btop"
+
+printf '{"text":"%s","tooltip":"%s"}\n' "$text" "$tooltip"

@@ -1,0 +1,27 @@
+{
+  "title": "Drift",
+  "shader": "plasma-mine-9.glsl",
+  "charset": " .:-=+*#%@",
+  "cell": 10,
+  "aspect": 1,
+  "fill": 0,
+  "background": "#050507",
+  "interaction": {
+    "mode": "swirl",
+    "strength": 0.4,
+    "radius": 0.25
+  },
+  "shape": "dots",
+  "style": "dots",
+  "palette": [
+    "#77685d",
+    "#ffb347",
+    "#fdfd96",
+    "#c1e1c1",
+    "#aec6cf",
+    "#cbaacb",
+    "#ffd1dc",
+    "#f5f5f5"
+  ],
+  "pace": 0.3
+}

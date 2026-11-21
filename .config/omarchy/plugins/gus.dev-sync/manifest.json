@@ -1,0 +1,16 @@
+{
+  "schemaVersion": 1,
+  "id": "gus.dev-sync",
+  "name": "Dev sync",
+  "version": "1.0.0",
+  "author": "Gus",
+  "description": "Safely updates every project to match main",
+  "kinds": ["bar-widget"],
+  "entryPoints": { "barWidget": "DevSync.qml" },
+  "barWidget": {
+    "displayName": "Dev sync",
+    "description": "Safe fast-forward of all projects",
+    "category": "System",
+    "allowMultiple": false
+  }
+}

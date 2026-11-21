@@ -1,0 +1,24 @@
+#!/bin/bash
+# dev-sync — bring every project up to date with its main branch, SAFELY.
+# Only ever fast-forwards a clean checkout that is on the default branch.
+# Never stashes, resets, checks out or discards anything; dirty repos are skipped.
+C=~/Documents/Coding
+for r in $(find "$C" -maxdepth 4 -name .git -not -path '*/node_modules/*' -not -path '*/.worktrees/*' -prune 2>/dev/null | sed 's#/.git$##' | sort); do
+  n=${r#$C/}
+  git -C "$r" remote get-url origin >/dev/null 2>&1 || { printf '· %-40s no remote\n' "$n"; continue; }
+  def=$(git -C "$r" symbolic-ref -q --short refs/remotes/origin/HEAD 2>/dev/null | sed 's#^origin/##'); def=${def:-main}
+  git -C "$r" fetch -q origin 2>/dev/null || { printf '✗ %-40s fetch failed\n' "$n"; continue; }
+  cur=$(git -C "$r" branch --show-current)
+  dirty=$(git -C "$r" status --porcelain | wc -l)
+  behind=$(git -C "$r" rev-list --count HEAD..origin/$def 2>/dev/null || echo 0)
+  ahead=$(git -C "$r" rev-list --count origin/$def..HEAD 2>/dev/null || echo 0)
+  if [ "$cur" != "$def" ]; then printf '⚠ %-40s on branch "%s" (not %s), left alone\n' "$n" "$cur" "$def"
+  elif [ "$dirty" -gt 0 ]; then printf '⚠ %-40s %s uncommitted files, left alone (%s behind)\n' "$n" "$dirty" "$behind"
+  elif [ "$behind" -eq 0 ] && [ "$ahead" -eq 0 ]; then printf '✓ %-40s 1:1 with %s\n' "$n" "$def"
+  elif [ "$behind" -eq 0 ]; then printf '↑ %-40s %s local commits not pushed\n' "$n" "$ahead"
+  elif [ "$ahead" -gt 0 ]; then printf '⚠ %-40s diverged (%s ahead, %s behind), left alone\n' "$n" "$ahead" "$behind"
+  elif git -C "$r" merge -q --ff-only origin/$def >/dev/null 2>&1; then printf '✓ %-40s updated (+%s commits)\n' "$n" "$behind"
+  else printf '✗ %-40s could not fast-forward, left alone\n' "$n"; fi
+done
+[ "$1" = "--pause" ] && { echo; read -rsn1 -p "press any key"; }
+exit 0
