@@ -2,6 +2,8 @@
 
 ![The desktop: ASCII Paper wallpaper, Omarchy bar, nothing else](screenshots/desktop.png)
 
+![Four seconds of the Drift wallpaper, recorded from the running setup](screenshots/drift.gif)
+
 Omarchy 4 on Arch Linux, Hyprland 0.56.2 in Lua mode, on a Dell G15 5525. The Radeon 680M drives
 the laptop panel, the RTX 3050 owns the HDMI port. The wallpaper is not a video: it is
 [ASCII Paper](https://cyoren.github.io/asciipaper/), an animated ASCII renderer running as its own
@@ -31,8 +33,10 @@ asciipaper set plasma-mine-9          # choose it and restart the service
 systemctl --user status asciipaper
 ```
 
-It is cheap by design: one full screen quad per frame, 9 fps when idle, and it pauses behind windows
-and while the machine is locked. On a 680M that matters more than it sounds.
+It is cheap by design: one full screen quad per frame, 9 fps when idle, and it pauses while a
+fullscreen window covers the monitor, which on Hyprland includes the lock screen. On a 680M that
+matters more than it sounds. `asciipaper layers` reports exactly what the running session is doing,
+including whether it is paused and why.
 
 ASCII Paper is free on Linux (tarball or PKGBUILD from the site above) and paid on the app stores.
 If you came here for ricing, the reusable part is the engine:
